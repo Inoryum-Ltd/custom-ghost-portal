@@ -23,9 +23,13 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${env.FRONTEND_URL}/success`,
     cancel_url: `${env.FRONTEND_URL}/cancel`,
-    metadata: {
+     metadata: {
       productId,
       plan
+    },
+    customer_update: { 
+      name: 'auto',   // ensures name shows up in Checkout
+      address: 'auto' // optional, also autofills address if available
     }
   });
 }
