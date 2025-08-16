@@ -5,6 +5,7 @@ import cors from 'cors';
 import env from './config/env.js';
 import checkoutRoutes from './routes/checkout.js';
 import webhookRoutes from './routes/stripe-webhook.js';
+import freeMemberRoutes from './routes/free-member.js';
 
 const app = express();
 
@@ -17,6 +18,12 @@ app.use(cors({
 
 // Normal JSON parser for normal routes
 app.use('/start-checkout', bodyParser.json());
+
+
+// Free Members
+app.use('/create-free-member', bodyParser.json());
+app.use(freeMemberRoutes);
+
 
 // Raw parser for Stripe webhook signature validation
 app.use('/custom-membership-stripe-webhook', webhookRoutes);
