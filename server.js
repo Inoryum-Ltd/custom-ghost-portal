@@ -1,11 +1,19 @@
 // server.js
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import env from './config/env.js';
 import checkoutRoutes from './routes/checkout.js';
 import webhookRoutes from './routes/stripe-webhook.js';
 
 const app = express();
+
+// Enable CORS for frontend domain
+app.use(cors({
+  origin: 'https://www.bkan.nl',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // Normal JSON parser for normal routes
 app.use('/start-checkout', bodyParser.json());
