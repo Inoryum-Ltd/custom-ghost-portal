@@ -46,7 +46,7 @@ router.post(
           plan
         });
 
-        console.log(`✅ Ghost member created: ${email} (${plan} plan)`);
+        console.log(`Ghost member created: ${email} (${plan} plan)`);
       } catch (err) {
         console.error('Error syncing with Ghost:', err);
       }
