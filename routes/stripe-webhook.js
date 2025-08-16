@@ -23,7 +23,7 @@ router.post(
 
         // Extract info from metadata & customer if available
         let email = session.customer_details?.email;
-        let name = session.customer_details?.name;
+        let name = session.metadata?.name;
         let productId = session.metadata?.productId;
         let plan = session.metadata?.plan;
 

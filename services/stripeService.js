@@ -20,16 +20,13 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
     mode: 'subscription',
     payment_method_types: ['card'],
     customer: customer.id,
-    customer_update: {
-      name: 'auto',
-      address: 'auto'
-    },
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${env.FRONTEND_URL}/success`,
     cancel_url: `${env.FRONTEND_URL}/cancel`,
     metadata: {
       productId,
-      plan
+      plan,
+      name
     }
   });
 }
