@@ -6,7 +6,7 @@ import env from './config/env.js';
 import checkoutRoutes from './routes/checkout.js';
 import webhookRoutes from './routes/stripe-webhook.js';
 import freeMemberRoutes from './routes/free-member.js';
-import compMemberRoutes from './routes/comp-member.js';
+import compMemberRoutes from './routes/comped-member.js';
 
 const app = express();
 
