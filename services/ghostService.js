@@ -41,9 +41,9 @@ export async function createCompGhostMember({ email, name, productId }) {
   const subscriptionData = {
     id: "",
     tier: { id: productId, active: true, expiry_at: null },
-    plan: { id: "", nickname: "Complimentary", interval, currency: "EUR", amount: 0 },
+    plan: { id: "", nickname: "Complimentary", currency: "EUR", amount: 0 },
     status: "active",
-    price: { id: "", price_id: "", nickname: "Complimentary", amount: 0, interval, type: "recurring", currency: "USD", tier: { id: "", tier_id: productId } },
+    price: { id: "", price_id: "", nickname: "Complimentary", amount: 0, type: "recurring", currency: "EUR", tier: { id: "", tier_id: productId } },
     offer: null
   };
 
