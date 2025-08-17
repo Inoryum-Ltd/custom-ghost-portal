@@ -34,3 +34,23 @@ export async function createFreeGhostMember({ email, name }) {
     throw new Error(`Ghost API error: ${err.message}`);
   }
 }
+
+export async function createCompGhostMember({ email, name, productId }) {
+
+  // Base subscription data
+  const subscriptionData = {
+    id: "",
+    tier: { id: productId, active: true, expiry_at: null },
+    plan: { id: "", nickname: "Complimentary", interval, currency: "EUR", amount: 0 },
+    status: "active",
+    price: { id: "", price_id: "", nickname: "Complimentary", amount: 0, interval, type: "recurring", currency: "USD", tier: { id: "", tier_id: productId } },
+    offer: null
+  };
+
+  return api.members.add({
+    email,
+    name,
+    tiers: [{ id: productId, expiry_at: null }],
+    subscriptions: [subscriptionData],
+  });
+}
