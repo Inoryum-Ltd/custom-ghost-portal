@@ -28,7 +28,6 @@ export async function createFreeGhostMember({ email, name }) {
     return await api.members.add({
       email,
       name,
-      // No stripe_customer_id or subscriptions for free members
     }, { send_email: true }); // Optional: send welcome email
   } catch (err) {
     throw new Error(`Ghost API error: ${err.message}`);
