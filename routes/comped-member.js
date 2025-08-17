@@ -3,7 +3,7 @@ import { createCompGhostMember } from '../services/ghostService.js';
 
 const router = express.Router();
 
-router.post('/create-comp-member', async (req, res) => {
+router.post('/create-comped-member', async (req, res) => {
   const { name, email, productId } = req.body;
 
   if (!name || !email || !productId) {
