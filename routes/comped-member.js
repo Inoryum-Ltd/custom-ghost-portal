@@ -1,5 +1,5 @@
 import express from 'express';
-import { createCompGhostMember } from '../services/ghostService.js';
+import { enqueueMemberCreation } from '../services/ghostService.js';
 
 const router = express.Router();
 
@@ -11,13 +11,20 @@ router.post('/create-comped-member', async (req, res) => {
   }
 
   try {
-    await createCompGhostMember({ email, name, productId });
-    res.status(200).json({ success: true });
+    await enqueueMemberCreation({
+      type: 'comp',
+      data: { email, name, productId }
+    });
+    
+    res.status(202).json({
+      success: true,
+      message: 'Comp member creation queued successfully'
+    });
   } catch (err) {
-    console.error('Error creating comp member:', err);
+    console.error('Error queuing comp member:', err);
     res.status(500).json({ 
-      error: 'Failed to create comp member',
-      details: err.message // Optional: include for debugging
+      error: 'Failed to queue comp member creation',
+      details: err.message
     });
   }
 });

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createFreeGhostMember } from '../services/ghostService.js';
+import { enqueueMemberCreation } from '../services/ghostService.js';
 
 const router = express.Router();
 
@@ -11,11 +11,18 @@ router.post('/create-free-member', async (req, res) => {
   }
 
   try {
-    await createFreeGhostMember({ email, name });
-    res.status(200).json({ success: true });
+    await enqueueMemberCreation({
+      type: 'free',
+      data: { email, name }
+    });
+    
+    res.status(202).json({
+      success: true,
+      message: 'Free member creation queued successfully'
+    });
   } catch (err) {
-    console.error('Error creating free member:', err);
-    res.status(500).json({ error: 'Failed to create free member' });
+    console.error('Error queuing free member:', err);
+    res.status(500).json({ error: 'Failed to queue free member creation' });
   }
 });
 

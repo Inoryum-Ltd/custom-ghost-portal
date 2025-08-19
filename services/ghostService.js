@@ -74,3 +74,5 @@ export async function createCompGhostMember({ email, name, productId }) {
     throw new Error(`Ghost API error: ${err.message}`);
   }
 }
+
+export { enqueueMemberCreation } from './queueService.js';
