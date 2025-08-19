@@ -1,11 +1,9 @@
-// services/stripeService.js
 import Stripe from 'stripe';
 import env from '../config/env.js';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 export async function createCheckoutSession(priceId, name, email, productId, plan) {
-  // Create customer first with metadata
   const customer = await stripe.customers.create({
     name,
     email,
@@ -15,7 +13,6 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
     }
   });
 
-  // Create checkout session linked to that customer
   return stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],

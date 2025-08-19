@@ -1,4 +1,3 @@
-// routes/checkout.js
 import express from 'express';
 import tierMap from '../config/tierMap.js';
 import { createCheckoutSession } from '../services/stripeService.js';
@@ -18,7 +17,7 @@ router.post('/start-checkout', async (req, res) => {
 
   try {
     const priceId = tierMap[productId][plan];
-    const session = await createCheckoutSession(priceId, name, email);
+    const session = await createCheckoutSession(priceId, name, email, productId, plan);
     res.json({ url: session.url });
   } catch (err) {
     console.error('Checkout error:', err);

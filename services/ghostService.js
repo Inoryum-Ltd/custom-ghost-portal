@@ -9,36 +9,31 @@ const api = new GhostAdminAPI({
 });
 
 export async function createGhostMember({ email, name, stripeCustomerId, stripeSubscriptionId, productId, plan }) {
-  try {
-    logger.info(`Creating paid member: ${email.substring(0, 3)}...@...`, { productId, plan });
-    const result = await api.members.add({
-      email,
-      name,
-      stripe_customer_id: stripeCustomerId,
-      subscriptions: [
-        { stripe_subscription_id: stripeSubscriptionId }
-      ]
-    });
-    logger.info(`Paid member created for ${email.substring(0, 3)}...@...`, { productId, plan });
-    return result;
-  } catch (err) {
-    logger.error(`Failed to create paid member ${email.substring(0, 3)}...@...`, {
-      error: err.message,
-      stack: err.stack,
+  try {
+    logger.info(`Creating paid member: ${email.substring(0, 3)}...@...`, { productId, plan });
+    const result = await api.members.add({
+      email,
+      name,
+      stripe_customer_id: stripeCustomerId,
+      subscriptions: [{ stripe_subscription_id: stripeSubscriptionId }]
+    });
+    logger.info(`Paid member created for ${email.substring(0, 3)}...@...`, { productId, plan });
+    return result;
+  } catch (err) {
+    logger.error(`Failed to create paid member ${email.substring(0, 3)}...@...`, {
+      error: err.message,
+      stack: err.stack,
       productId,
       plan
-    });
-    throw new Error(`Ghost API error: ${err.message}`);
-  }
+    });
+    throw new Error(`Ghost API error: ${err.message}`);
+  }
 }
 
 export async function createFreeGhostMember({ email, name }) {
   try {
     logger.info(`Creating free member: ${email.substring(0, 3)}...@...`);
-    const result = await api.members.add({
-      email,
-      name,
-    }, { send_email: true });
+    const result = await api.members.add({ email, name }, { send_email: true });
     logger.info(`Free member created for ${email.substring(0, 3)}...@...`);
     return result;
   } catch (err) {

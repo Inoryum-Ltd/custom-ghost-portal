@@ -5,6 +5,40 @@ import logger from '../config/logger.js';
 
 const router = express.Router();
 
+const processPaidCheckout = async (session) => {
+  let email = session.customer_details?.email;
+  let name = session.metadata?.name;
+  let productId = session.metadata?.productId;
+  let plan = session.metadata?.plan;
+
+  if (!email || !name) {
+    const customer = await retrieveCustomer(session.customer);
+    email = email || customer.email;
+    name = name || customer.name;
+  }
+
+  if (!session.subscription) {
+    logger.warn('No subscription found in session. This is not a subscription checkout.', { sessionId: session.id });
+    return;
+  }
+
+  const subscription = await retrieveSubscription(session.subscription);
+
+  // CRITICAL CHECK: Ensure the plan has a price greater than zero
+  if (subscription.items.data.length > 0 && subscription.items.data[0].price.unit_amount > 0) {
+    await createGhostMember({
+      email,
+      name,
+      stripeCustomerId: session.customer,
+      stripeSubscriptionId: subscription.id,
+      productId,
+      plan
+    });
+  } else {
+    logger.info('Skipping paid member creation for a zero-amount subscription.');
+  }
+};
+
 router.post(
   '/custom-membership-stripe-webhook',
   express.raw({ type: 'application/json' }),
@@ -22,65 +56,32 @@ router.post(
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    if (event.type === 'checkout.session.completed') {
-      try {
-        const session = event.data.object;
-        logger.info('Processing checkout.session.completed event', {
-          sessionId: session.id,
-          customer: session.customer
-        });
-
-        // Extract info from metadata & customer if available
-        let email = session.customer_details?.email;
-        let name = session.metadata?.name;
-        let productId = session.metadata?.productId;
-        let plan = session.metadata?.plan;
-
-        logger.debug('Extracted session metadata', {
-          emailPresent: !!email,
-          namePresent: !!name,
-          productId,
-          plan
-        });
-
-        // If missing, fetch from Stripe (fallback)
-        if (!email || !name) {
-          logger.debug('Missing email or name, fetching customer from Stripe');
-          const customer = await retrieveCustomer(session.customer);
-          email = email || customer.email;
-          name = name || customer.name;
+    switch (event.type) {
+      case 'checkout.session.completed':
+        try {
+          const session = event.data.object;
+          if (session.payment_status === 'paid') {
+            await processPaidCheckout(session);
+          } else {
+            logger.info(`Checkout session completed, but payment is not yet paid. Waiting for async_payment_succeeded. Session ID: ${session.id}`);
+          }
+        } catch (err) {
+          logger.error('Error processing checkout.session.completed', { error: err.message, stack: err.stack });
         }
+        break;
 
-        // Always fetch subscription details
-        logger.debug('Fetching subscription details');
-        const subscription = await retrieveSubscription(session.subscription);
+      case 'checkout.session.async_payment_succeeded':
+        try {
+          const session = event.data.object;
+          logger.info(`Async payment succeeded for session: ${session.id}. Proceeding with member creation.`);
+          await processPaidCheckout(session);
+        } catch (err) {
+          logger.error('Error processing checkout.session.async_payment_succeeded', { error: err.message, stack: err.stack });
+        }
+        break;
 
-        logger.info('Creating Ghost member', {
-          email: email?.substring(0, 3) + '...@...' + email?.split('@')[1]?.substring(0, 3),
-          name: name?.substring(0, 2) + '...',
-          productId,
-          plan
-        });
-
-        await createGhostMember({
-          email,
-          name,
-          stripeCustomerId: session.customer,
-          stripeSubscriptionId: subscription.id,
-          productId,
-          plan
-        });
-
-        logger.info(`Ghost member created: ${email?.substring(0, 3)}... (${plan} plan)`);
-      } catch (err) {
-        logger.error('Error syncing with Ghost', {
-          error: err.message,
-          stack: err.stack,
-          eventType: event.type
-        });
-      }
-    } else {
-      logger.debug('Unhandled Stripe event type', { eventType: event.type });
+      default:
+        logger.debug('Unhandled Stripe event type', { eventType: event.type });
     }
 
     res.status(200).end();
