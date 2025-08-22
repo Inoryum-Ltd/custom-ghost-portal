@@ -14,7 +14,7 @@ const app = express();
 
 // Enable CORS for frontend domain
 app.use(cors({
-  origin: 'https://www.bkan.nl',
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
