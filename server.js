@@ -6,6 +6,7 @@ import checkoutRoutes from './routes/checkout.js';
 import webhookRoutes from './routes/stripe-webhook.js';
 import freeMemberRoutes from './routes/free-member.js';
 import compMemberRoutes from './routes/comped-member.js';
+import noLoginMemberRoutes from './routes/no-login-member.js';
 import './workers/memberWorker.js';
 import { connection } from './config/queue.js';
 import logger from './config/logger.js';
@@ -32,6 +33,11 @@ app.use(freeMemberRoutes);
 // Comped Members
 app.use('/create-comped-member', bodyParser.json());
 app.use(compMemberRoutes);
+
+
+// No-Login Members <-- New Route Section
+app.use('/create-no-login-member', bodyParser.json());
+app.use(noLoginMemberRoutes);
 
 // Routes
 app.use(checkoutRoutes);

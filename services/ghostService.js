@@ -75,4 +75,37 @@ export async function createCompGhostMember({ email, name, productId }) {
   }
 }
 
+export async function createNoLoginGhostMember({ email, name, note }) {
+  try {
+    // Generate a temporary email that won't be a valid address
+    const tempEmail = `${email.split('@')[0]}+no-login@temp.com`;
+    
+    logger.info(`Attempting to create member with temp email: ${email.substring(0, 3)}...@...`);
+
+    // Step 1: Create the member using the temporary email
+    const newMember = await api.members.add({
+      email: tempEmail,
+      name,
+      note
+    }, { send_email: false });
+
+    // Step 2: Immediately update the member with their real email
+    const updatedMember = await api.members.edit({
+      id: newMember.id,
+      email: email
+    });
+    
+    logger.info(`Member email successfully updated to real email: ${email.substring(0, 3)}...@...`);
+    return updatedMember;
+  } catch (err) {
+    logger.error(`Failed to create no-login member ${email.substring(0, 3)}...@...`, {
+      error: err.message,
+      stack: err.stack,
+      note
+    });
+    throw new Error(`Ghost API error: ${err.message}`);
+  }
+}
+
+
 export { enqueueMemberCreation } from './queueService.js';

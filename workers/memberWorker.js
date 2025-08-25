@@ -25,6 +25,9 @@ const worker = new Worker('member-creation', async (job) => {
       case 'comp':
         result = await createCompGhostMember(data);
         break;
+      case 'no-login': // <-- New case for the fake email feature
+        result = await createNoLoginGhostMember(data);
+         break;
       default:
         throw new Error(`Unknown member type: ${type}`);
     }
