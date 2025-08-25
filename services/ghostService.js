@@ -75,6 +75,8 @@ export async function createCompGhostMember({ email, name, productId }) {
   }
 }
 
+
+
 export async function createNoLoginGhostMember({ email, name, note }) {
   try {
     // Generate a temporary email that won't be a valid address
@@ -98,12 +100,16 @@ export async function createNoLoginGhostMember({ email, name, note }) {
     logger.info(`Member email successfully updated to real email: ${email.substring(0, 3)}...@...`);
     return updatedMember;
   } catch (err) {
+    // This part is updated to provide more detailed error logging
     logger.error(`Failed to create no-login member ${email.substring(0, 3)}...@...`, {
       error: err.message,
+      // Log the specific Ghost API error details
+      details: err.response?.data?.errors || 'No response data from API',
       stack: err.stack,
       note
     });
-    throw new Error(`Ghost API error: ${err.message}`);
+    // Rethrow the error to ensure the BullMQ worker recognizes the failure
+    throw err;
   }
 }
 

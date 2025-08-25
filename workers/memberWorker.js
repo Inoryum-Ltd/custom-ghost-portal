@@ -1,6 +1,9 @@
+// In workers/memberWorker.js
+
 import { Worker } from 'bullmq';
 import { connection } from '../config/queue.js';
-import { createGhostMember, createFreeGhostMember, createCompGhostMember } from '../services/ghostService.js';
+// Make sure to import the new function
+import { createGhostMember, createFreeGhostMember, createCompGhostMember, createNoLoginGhostMember } from '../services/ghostService.js';
 import logger from '../config/logger.js';
 import env from '../config/env.js';
 
@@ -25,9 +28,9 @@ const worker = new Worker('member-creation', async (job) => {
       case 'comp':
         result = await createCompGhostMember(data);
         break;
-      case 'no-login': // <-- New case for the fake email feature
+      case 'no-login':
         result = await createNoLoginGhostMember(data);
-         break;
+        break;
       default:
         throw new Error(`Unknown member type: ${type}`);
     }
@@ -40,11 +43,14 @@ const worker = new Worker('member-creation', async (job) => {
     return result;
     
   } catch (error) {
+    // This is the key update. Log the full error object.
     logger.error(`Member creation job ${job.id} failed`, {
       error: error.message,
       type,
       attempt: job.attemptsMade,
-      data: job.data
+      data: job.data,
+      // This will provide the most detailed debug information
+      fullError: error
     });
     throw error;
   }
@@ -58,9 +64,11 @@ worker.on('completed', (job) => {
 });
 
 worker.on('failed', (job, error) => {
+  // Update the on-failed handler to log the error object as well
   logger.error(`Job ${job.id} failed after ${job.attemptsMade} attempts`, {
     error: error.message,
-    type: job.data.type
+    type: job.data.type,
+    fullError: error
   });
 });
 
