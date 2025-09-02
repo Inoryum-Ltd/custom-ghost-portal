@@ -76,6 +76,37 @@ export async function createCompGhostMember({ email, name, productId }) {
 }
 
 
+export async function createEmCompGhostMember({ email, name, productId }) {
+  try {
+    logger.info(`Creating EMcomp member: ${email.substring(0, 3)}...@...`, { productId });
+    const subscriptionData = {
+      id: "",
+      tier: { id: productId, active: true, expiry_at: null },
+      plan: { id: "", nickname: "Complimentary", currency: "EUR", amount: 0 },
+      status: "active",
+      price: { id: "", price_id: "", nickname: "Complimentary", amount: 0, type: "recurring", currency: "EUR", tier: { id: "", tier_id: productId } },
+      offer: null
+    };
+
+    const result = await api.members.add({
+      email,
+      name,
+      tiers: [{ id: productId, expiry_at: null }],
+      subscriptions: [subscriptionData],
+    });
+    logger.info(`EMComp member created for ${email.substring(0, 3)}...@...`, { productId });
+    return result;
+  } catch (err) {
+    logger.error(`Failed to create comp member ${email.substring(0, 3)}...@...`, {
+      error: err.message,
+      stack: err.stack,
+      productId
+    });
+    throw new Error(`Ghost API error: ${err.message}`);
+  }
+}
+
+
 
 export async function createNoLoginGhostMember({ email, name, note }) {
   try {

@@ -6,6 +6,7 @@ import checkoutRoutes from './routes/checkout.js';
 import webhookRoutes from './routes/stripe-webhook.js';
 import freeMemberRoutes from './routes/free-member.js';
 import compMemberRoutes from './routes/comped-member.js';
+import employerMemberRoutes from './routes/employer-comped-member.js';
 import noLoginMemberRoutes from './routes/no-login-member.js';
 import './workers/memberWorker.js';
 import { connection } from './config/queue.js';
@@ -29,6 +30,12 @@ app.use('/start-checkout', bodyParser.json());
 // Free Members
 app.use('/create-free-member', bodyParser.json());
 app.use(freeMemberRoutes);
+
+
+// EMComped Members
+app.use('/create-employer-comped-member', bodyParser.json());
+app.use(employerMemberRoutes);
+
 
 // Comped Members
 app.use('/create-comped-member', bodyParser.json());

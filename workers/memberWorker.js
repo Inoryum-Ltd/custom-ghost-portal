@@ -3,7 +3,7 @@
 import { Worker } from 'bullmq';
 import { connection } from '../config/queue.js';
 // Make sure to import the new function
-import { createGhostMember, createFreeGhostMember, createCompGhostMember, createNoLoginGhostMember } from '../services/ghostService.js';
+import { createGhostMember, createFreeGhostMember, createCompGhostMember, createNoLoginGhostMember, createEmCompGhostMember } from '../services/ghostService.js';
 import logger from '../config/logger.js';
 import env from '../config/env.js';
 
@@ -24,6 +24,9 @@ const worker = new Worker('member-creation', async (job) => {
         break;
       case 'free':
         result = await createFreeGhostMember(data);
+        break;
+      case 'emcomp':
+        result = await createEmCompGhostMember(data);
         break;
       case 'comp':
         result = await createCompGhostMember(data);
