@@ -61,6 +61,21 @@ async function processStripeEventAsync(event) {
       }
       break;
 
+       case 'checkout.session.async_payment_failed':
+        try {
+          const session = event.data.object;
+          logger.warn(
+            `❌ Async payment failed for session: ${session.id}, email: ${session.customer_details?.email}`
+          );
+          // optional: notify user, send email, or enqueue a failed-member event
+        } catch (err) {
+          logger.error(
+            'Error processing checkout.session.async_payment_failed',
+            { error: err.message, stack: err.stack }
+          );
+        }
+      break;
+
     default:
       logger.debug('Unhandled Stripe event type', { eventType: event.type });
   }
