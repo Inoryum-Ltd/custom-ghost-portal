@@ -17,10 +17,7 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
 
   return stripe.checkout.sessions.create({
     mode: 'subscription',
-    automatic_payment_methods: {
-      enabled: true,
-    },
-    //payment_method_types: ['card', 'ideal'],
+    payment_method_types: ['card', 'ideal'],
     customer: customer.id,
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${env.FRONTEND_URL}/success`,
