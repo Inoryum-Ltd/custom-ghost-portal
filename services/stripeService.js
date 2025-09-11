@@ -1,7 +1,9 @@
 import Stripe from 'stripe';
 import env from '../config/env.js';
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
+  apiVersion: '2025-08-27.basil', // This is where the API version is set
+});
 
 export async function createCheckoutSession(priceId, name, email, productId, plan) {
   const customer = await stripe.customers.create({
