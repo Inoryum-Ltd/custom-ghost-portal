@@ -15,6 +15,9 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
 
   return stripe.checkout.sessions.create({
     mode: 'subscription',
+    automatic_payment_methods: {
+      enabled: true,
+    },
     //payment_method_types: ['card', 'ideal'],
     customer: customer.id,
     line_items: [{ price: priceId, quantity: 1 }],
@@ -24,9 +27,6 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
       productId,
       plan,
       name
-    },
-    automatic_payment_methods: {
-      enabled: true
     }
   });
 }
