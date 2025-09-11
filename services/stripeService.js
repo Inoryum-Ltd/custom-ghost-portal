@@ -24,6 +24,9 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
       productId,
       plan,
       name
+    },
+    automatic_payment_methods: {
+      enabled: true
     }
   });
 }
