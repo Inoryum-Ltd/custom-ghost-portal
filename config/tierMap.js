@@ -1,3 +1,4 @@
+
 // config/tierMap.js
 // Map Ghost Product IDs to Stripe Price IDs
 export default {
@@ -10,3 +11,4 @@ export default {
     yearly: 'price_1Qyyyyyy_yearly'
   }
 };
+

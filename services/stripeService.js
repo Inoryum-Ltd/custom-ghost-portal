@@ -2,10 +2,11 @@ import Stripe from 'stripe';
 import env from '../config/env.js';
 
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: '2025-08-27.basil', // This is where the API version is set
+  apiVersion: '2025-08-27.basil',
 });
 
 export async function createCheckoutSession(priceId, name, email, productId, plan) {
+  // 1. Create a new Customer with name and email
   const customer = await stripe.customers.create({
     name,
     email,
@@ -15,6 +16,7 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
     }
   });
 
+  // 2. Create the Checkout Session with automatic_tax enabled and best practices
   return stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card', 'ideal'],
@@ -26,6 +28,22 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
       productId,
       plan,
       name
+    },
+    
+    // 💡 REQUIRED: Enable automatic tax calculation (Stripe Tax)
+    automatic_tax: {
+      enabled: true, 
+    },
+
+    // collected in Checkout for more accurate tax calculation.
+    customer_update: {
+      address: 'auto',
+      name: 'auto'
+    },
+
+    // for B2B tax compliance and exemptions.
+    tax_id_collection: {
+      enabled: true,
     }
   });
 }
