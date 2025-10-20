@@ -29,6 +29,9 @@ export async function createCheckoutSession(priceId, name, email, productId, pla
       plan,
       name
     },
+
+    // 1. ADD THIS LINE: Force billing address collection
+    billing_address_collection: 'required', // or 'auto'
     
     // 💡 REQUIRED: Enable automatic tax calculation (Stripe Tax)
     automatic_tax: {
